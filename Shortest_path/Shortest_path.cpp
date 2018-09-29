@@ -6,6 +6,7 @@
 #include <string>
 #include <math.h>
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -16,15 +17,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	map<string,string> coordinates; //x,y
 
 	coordinates.insert(pair<string,string>("A","1,1"));
-	coordinates.insert(pair<string,string>("B","9,9"));
+	coordinates.insert(pair<string,string>("B","11,2"));
 	coordinates.insert(pair<string,string>("C","2,9"));
-	coordinates.insert(pair<string,string>("D","8,3"));
-	coordinates.insert(pair<string,string>("E","2,4"));
-	coordinates.insert(pair<string,string>("F","1,7"));
-	coordinates.insert(pair<string,string>("G","2,6"));
-	coordinates.insert(pair<string,string>("H","7,4"));
-	coordinates.insert(pair<string,string>("I","8,1"));
-	coordinates.insert(pair<string,string>("J","9,3"));
+	coordinates.insert(pair<string,string>("D","8,13"));
+	coordinates.insert(pair<string,string>("E","12,4"));
+	coordinates.insert(pair<string,string>("F","0,7"));
+	coordinates.insert(pair<string,string>("G","12,6"));
+	coordinates.insert(pair<string,string>("H","7,14"));
+	coordinates.insert(pair<string,string>("I","8,10"));
+	coordinates.insert(pair<string,string>("J","6,13"));
 
 	vector <double> distances[128][128];
 	int i = 0;
@@ -33,8 +34,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		int j = 0;
 		string coord1 = iter->second;
-		string coord1_x = coord1.substr(0,1);
-		string coord1_y = coord1.substr(2,1);
+		
+		char *nextToken = NULL;
+		string coord1_x = strtok_s((char*)coord1.c_str(), ",", &nextToken);
+		string coord1_y = nextToken;
 
 		int coord1_x_int = atoi(coord1_x.c_str());
 		int coord1_y_int = atoi(coord1_y.c_str());
@@ -42,8 +45,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		for (map<string, string>::iterator iter2 = coordinates.begin(); iter2 != coordinates.end(); ++iter2) 
 		{
 			string coord2 = iter2->second;
-			string coord2_x = coord2.substr(0,1);
-			string coord2_y = coord2.substr(2,1);
+			
+			string coord2_x = strtok_s((char*)coord2.c_str(), ",", &nextToken);
+			string coord2_y = nextToken;
 
 			int coord2_x_int = atoi(coord2_x.c_str());
 			int coord2_y_int = atoi(coord2_y.c_str());
@@ -62,7 +66,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	
 	string path = "A->", node;
 	int start_node = 0;
-
+	double total_distance = 0;
+	
 	bool destination_reached = false;
 
 	vector<int> hops_done;
@@ -117,6 +122,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		hops_done.push_back(hop_track);
 
+		total_distance += min_distance;
+
 		if(coordinates.find(node) == coordinates.find("B"))
 		{
 			// reached destination
@@ -135,5 +142,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 
+	cout << "Shortest Path = " << path << ". Total Distance = " << total_distance << endl;
 	return 0;
 }
