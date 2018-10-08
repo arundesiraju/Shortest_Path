@@ -61,87 +61,109 @@ int _tmain(int argc, _TCHAR* argv[])
 		i++;
 	}
 
-	// go from A -> D
+	
 	int min_distance_index = 0;
 	
-	string path = "A->", node;
+	string start_point = "A";
+	string end_point = "B";
+
+	string path = start_point+"->"; 
+	string node;
+
 	int start_node = 0;
-	double total_distance = 0;
-	
+		
+	for(map<string, string>::iterator iter = coordinates.begin(); iter != coordinates.end(); iter++)
+	{
+		if(iter->first == start_point)
+			break;
+		else
+			start_node++;
+	}
+		
 	bool destination_reached = false;
 
 	vector<int> hops_done;
-
 	int hop_track = -1;
 
-	for (int trace = 0; trace < coordinates.size(); trace ++)
+	double total_distance = 0;
+
+	if(start_point == end_point)
 	{
-		double min_distance = MAX_DISTANCE;
-
-		for(int hop = 0; hop<coordinates.size(); hop++)
+		path = start_point + "->" + end_point;
+		// distance = 0
+	}
+	else
+	{
+		for (int trace = 0; trace < (int)coordinates.size(); trace ++)
 		{
-			bool proceed = false;
-
-			int k = 0;
-
-			if (std::find(hops_done.begin(), hops_done.end(), hop) == hops_done.end())
+			double min_distance = MAX_DISTANCE;
+			
+			for(int hop = 0; hop<(int)coordinates.size(); hop++)
 			{
-				if(distances[start_node][hop].at(0) - 0.0001 > 0.0001)
+				bool node_used_already = false;
+
+				int k = 0;
+
+				if (std::find(hops_done.begin(), hops_done.end(), hop) == hops_done.end())
 				{
-					if(distances[start_node][hop].at(0) < min_distance)
+					if(distances[start_node][hop].at(0) - 0.0001 > 0.0001)
 					{
-						min_distance = distances[start_node][hop].at(0);
-						min_distance_index = hop;
-
-						for (map<string, string>::iterator iter = coordinates.begin(); iter != coordinates.end(); ++iter) 
+						if(distances[start_node][hop].at(0) < min_distance)
 						{
-							if(proceed)
-								break;
+							min_distance = distances[start_node][hop].at(0);
+							min_distance_index = hop;
 
-							if(k == min_distance_index)
+							for (map<string, string>::iterator iter = coordinates.begin(); iter != coordinates.end(); ++iter) 
 							{
-								node = iter->first;
-								if(path.find(node) != std::string::npos)
+								if(node_used_already)
+									break;
+
+								if(k == min_distance_index)
 								{
-									node = "";
-									proceed = true;
-									min_distance = MAX_DISTANCE;
-									continue;
+									node = iter->first;
+									if(path.find(node) != std::string::npos)
+									{
+										node = "";
+										node_used_already = true;
+										min_distance = MAX_DISTANCE;
+										continue;
+									}
+
+									hop_track = hop;
+									break;
 								}
-								
-								hop_track = hop;
-								break;
+
+								k++;
 							}
-
-							k++;
-						}
+						} 
 					} 
-				} 
+				}
 			}
-		}
 
-		hops_done.push_back(hop_track);
+			hops_done.push_back(hop_track);
 
-		total_distance += min_distance;
+			total_distance += min_distance;
 
-		if(coordinates.find(node) == coordinates.find("B"))
-		{
-			// reached destination
-			destination_reached = true;
-		}
+			if(coordinates.find(node) == coordinates.find(end_point))
+			{
+				// reached destination
+				destination_reached = true;
+			}
 
-		if(destination_reached)
-		{
-			path += node; 
-			break;
-		}
-		else
-		{
-			path += node + "->"; 
-			start_node = min_distance_index;
+			if(destination_reached)
+			{
+				path += node; 
+				break;
+			}
+			else
+			{
+				path += node + "->"; 
+				start_node = min_distance_index;
+			}
 		}
 	}
 
-	cout << "Shortest Path = " << path << ". Total Distance = " << total_distance << endl;
+	cout << "Shortest Path = " << path << ". Total Distance = " << total_distance << endl; 
+	
 	return 0;
 }
